@@ -1,66 +1,109 @@
-import { GitHubBanner, Refine, WelcomePage } from "@refinedev/core";
+import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
+
+import { RefineThemes, useNotificationProvider } from "@refinedev/antd";
+import { Authenticated, ErrorComponent, Refine, WelcomePage } from "@refinedev/core";
 import { DevtoolsPanel, DevtoolsProvider } from "@refinedev/devtools";
-import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
-
-import { useNotificationProvider } from "@refinedev/antd";
-import "@refinedev/antd/dist/reset.css";
-
-import dataProvider, {
-  GraphQLClient,
-  liveProvider,
-} from "@refinedev/nestjs-query";
-import routerBindings, {
+import routerProvider, {
+  CatchAllNavigate,
   DocumentTitleHandler,
+  NavigateToResource,
   UnsavedChangesNotifier,
 } from "@refinedev/react-router-v6";
-import { App as AntdApp } from "antd";
-import { createClient } from "graphql-ws";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { authProvider } from "./authProvider";
-import { ColorModeContextProvider } from "./contexts/color-mode";
 
-const API_URL = "https://api.nestjs-query.refine.dev/graphql";
-const WS_URL = "wss://api.nestjs-query.refine.dev/graphql";
+import { App as AntdApp, ConfigProvider } from "antd";
+import {Home, ForgotPassword, Login, Register } from './pages';
 
-const gqlClient = new GraphQLClient(API_URL);
-const wsClient = createClient({ url: WS_URL });
+// import { Layout } from "@/components";
+// import { resources } from "@/config/resources";
+import { authProvider, dataProvider, liveProvider } from "./providers";
+// import {
+//   CompanyCreatePage,
+//   CompanyEditPage,
+//   CompanyListPage,
+//   DashboardPage,
+//   LoginPage,
+//   TasksCreatePage,
+//   TasksEditPage,
+//   TasksListPage,
+// } from "@/routes";
 
-function App() {
+import "@refinedev/antd/dist/reset.css";
+import routerBindings from "@refinedev/react-router-v6";
+import Layout from "./components/layout";
+import { resources } from "./config/resources";
+import CompanyList from "./pages/company/list";
+import Create from "./pages/company/create";
+import Edit from './pages/company/edit'
+import TasksList from "./pages/tasks/list";
+import TasksCreatePage from "./pages/tasks/create";
+import TasksEditPage from "./pages/tasks/edit";
+
+const App = () => {
   return (
     <BrowserRouter>
-      <GitHubBanner />
-      <RefineKbarProvider>
-        <ColorModeContextProvider>
-          <AntdApp>
-            <DevtoolsProvider>
-              <Refine
-                dataProvider={dataProvider(gqlClient)}
-                liveProvider={liveProvider(wsClient)}
-                notificationProvider={useNotificationProvider}
-                routerProvider={routerBindings}
-                authProvider={authProvider}
-                options={{
-                  syncWithLocation: true,
-                  warnWhenUnsavedChanges: true,
-                  useNewQueryKeys: true,
-                  projectId: "Yyb6jN-4nWN9P-AAc9R5",
-                  liveMode: "auto",
-                }}
-              >
-                <Routes>
-                  <Route index element={<WelcomePage />} />
-                </Routes>
-                <RefineKbar />
-                <UnsavedChangesNotifier />
-                <DocumentTitleHandler />
-              </Refine>
-              <DevtoolsPanel />
-            </DevtoolsProvider>
-          </AntdApp>
-        </ColorModeContextProvider>
-      </RefineKbarProvider>
+      <ConfigProvider theme={RefineThemes.Blue}>
+        <AntdApp>
+          <DevtoolsProvider>
+            <Refine
+             
+              dataProvider={dataProvider}
+              liveProvider={liveProvider}
+              notificationProvider={useNotificationProvider}
+              routerProvider={routerBindings}
+              authProvider={authProvider}
+              resources={resources}
+              options={{
+                syncWithLocation: true,
+                warnWhenUnsavedChanges: true,
+                liveMode: "auto",
+                useNewQueryKeys: true,
+              }}
+            >
+              <Routes>
+                
+                
+                <Route path="/register" element={<Register />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                 <Route
+                  element={
+                    <Authenticated
+                      key="authenticated-layout"
+                      fallback={<CatchAllNavigate to="/login" />}
+                    >
+                       <Layout>
+                        <Outlet />
+                      </Layout> 
+                    </Authenticated>
+                  }>
+                    <Route index element={<Home />} />
+                     <Route path="/companies"> 
+                     <Route index element={<CompanyList />}/>
+                     <Route path="new" element={<Create/>}/>
+                     <Route path="edit/:id" element={<Edit/>}/>
+                     </Route>
+                     <Route path="/tasks" element={
+                      
+                      <TasksList>
+                      <Outlet/>
+                      </TasksList>
+                    }> 
+                    <Route path="new" element={<TasksCreatePage />} />
+                    <Route path="edit/:id" element={<TasksEditPage />} /> 
+                     </Route>
+                     
+                  
+                   </Route>
+              </Routes>
+              <UnsavedChangesNotifier />
+              <DocumentTitleHandler />
+            </Refine>
+            <DevtoolsPanel />
+          </DevtoolsProvider>
+        </AntdApp>
+      </ConfigProvider>
     </BrowserRouter>
   );
-}
+};
 
 export default App;
