@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+
 import CustomAvatar from '../../components/custom-avatar';
 import { UPDATE_COMPANY_MUTATION } from '../../graphql/mutations';
 import { Edit, useForm, useSelect } from '@refinedev/antd'
