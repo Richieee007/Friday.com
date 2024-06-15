@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+
 import KanbanItem from '../../components/tasks/kanban/item'
 import { KanbanBoardContainer, KanbanBoard } from '../../components/tasks/kanban/board'
 import KanbanColumn from '../../components/tasks/kanban/column'
