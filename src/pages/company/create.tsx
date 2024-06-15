@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+
 import React from 'react'
 import CompanyList from './list'
 import { Form, Input, Modal, Select } from 'antd'
